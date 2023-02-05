@@ -2,3 +2,20 @@
     margin: 0;
     padding: 0;
 }
+
+.spir_wrapper {
+    border: 1px solid silver;
+    width: 500px;
+    height: 500px;
+    margin: 50PX auto;
+}
+#spir {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+#spir .row {
+    display: flex;
+    justify-content: center;
+}

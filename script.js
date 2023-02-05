@@ -1,6 +1,16 @@
 
 function spiralize (n) {
     class SpiralizeClass {
+        constructor(n){
+            this.lvls = Array(n).fill().map(() => Array(n).fill(1));
+            this.init();
+        }
+        directSide = this.directSideGen();
+        pos = {
+            row : 1,
+            column : 0
+        }
+        flag = true;
         *directSideGen() {
             while (true){
                 yield "right";
@@ -9,15 +19,6 @@ function spiralize (n) {
                 yield "top";
             }
         }
-        directSide = this.directSideGen();
-        pos = {
-            row : 1,
-            column : 0
-        }
-        flag = true;
-        constructor(n){
-            this.lvls = Array(n).fill().map(() => Array(n).fill(1));
-        }
         getRow(number){
             let result = [];
             for (let i = 0; i < this.lvls[0].length; i++) {
@@ -25,11 +26,24 @@ function spiralize (n) {
             }
             return result;
         }
-        setRow(arr,number){
-            for (let i = 0; i < this.lvls[0].length; i++) {
-                this.lvls[number][i] = arr[i];
+        setRow(arr,number,direct){
+            if (direct == "right") {
+                let i = 0;
+                const timer = setInterval(()=>{
+                    if (this.lvls[number][i] !== arr[i]) document.getElementsByClassName(`n${number}_${i}`)[0].src = "/img/red_square-48.png";
+                    this.lvls[number][i] = arr[i];
+                    i++;
+                    if (i == this.lvls[0].length) clearTimeout(timer);
+                }, 800/this.lvls[0].length);
+            } else {
+                let i = this.lvls[0].length - 1;
+                const timer = setInterval(()=>{
+                    if (this.lvls[number][i] !== arr[i]) document.getElementsByClassName(`n${number}_${i}`)[0].src = "/img/red_square-48.png";
+                    this.lvls[number][i] = arr[i];
+                    i--;
+                    if (i == 0) clearTimeout(timer);
+                }, 800/this.lvls[0].length);
             }
-            
         }
         getColumn(number){
             let result = [];
@@ -38,9 +52,23 @@ function spiralize (n) {
             }
             return result;
         }
-        setColumn(arr,number){
-            for (let i = 0; i < this.lvls[0].length; i++) {
-                this.lvls[i][number] = arr[i];
+        setColumn(arr,number,direct){
+            if (direct == "bottom") {
+                let i = 0;
+                const timer = setInterval(()=>{
+                    if (this.lvls[i][number] !== arr[i]) document.getElementsByClassName(`n${i}_${number}`)[0].src = "/img/red_square-48.png";
+                    this.lvls[i][number] = arr[i];
+                    i++;
+                    if (i == this.lvls[0].length) clearTimeout(timer);
+                }, 800/this.lvls[0].length);
+            } else {
+                let i = this.lvls[0].length - 1;
+                const timer = setInterval(()=>{
+                    if (this.lvls[i][number] !== arr[i]) document.getElementsByClassName(`n${i}_${number}`)[0].src = "/img/red_square-48.png";
+                    this.lvls[i][number] = arr[i];
+                    i--;
+                    if (i == 0) clearTimeout(timer);
+                }, 800/this.lvls[0].length);
             }
         }
         spirArr(arr,from,reverse){
@@ -73,32 +101,51 @@ function spiralize (n) {
                 case "right": console.log('#right');
                     arr = this.getRow(this.pos.row);
                     [arr, this.pos.column] = this.spirArr(arr,this.pos.column, false);
-                    this.setRow(arr, this.pos.row);
+                    this.setRow(arr, this.pos.row, "right");
                     break;
                 case "bottom": console.log('#bottom');
                     arr = this.getColumn(this.pos.column);
                     [arr, this.pos.row] = this.spirArr(arr, this.pos.row, false);
-                    this.setColumn(arr, this.pos.column);
+                    this.setColumn(arr, this.pos.column, "bottom");
                     break;
                 case "left": console.log('#left');
                     arr = this.getRow(this.pos.row);
                     [arr, this.pos.column] = this.spirArr(arr, this.pos.column, true);
-                    this.setRow(arr.reverse(), this.pos.row);
+                    this.setRow(arr.reverse(), this.pos.row, "left");
                     break;
                 case "top": console.log('#top');
                     arr = this.getColumn(this.pos.column);
                     [arr, this.pos.row] = this.spirArr(arr, this.pos.row, true);
-                    this.setColumn(arr, this.pos.column);
+                    this.setColumn(arr, this.pos.column, "top");
                     break;
             }
         }
+        init(){
+            //append n*n matrix of img into '#spir'
+            //every elem has 2 class
+            //'row', 'n$$' $$ - number of elem!
+            let elem;
+            for (let i = 0; i < n; i++) {
+                elem = document.createElement('div');
+                elem.className = "row";
+                document.getElementById("spir").append(elem);
+                for (let j = 0; j < n; j++) {
+                    elem = document.createElement('img');
+                    elem.className += `n${i}_${j}`;
+                    elem.src = "/img/green-square-48.png";
+                    document.getElementById("spir").lastChild.append(elem);
+                }
+            }
+        }
     }
-
     let sp = new SpiralizeClass(n);
-
-    while (sp.flag) {
-        sp.spir();
-    }
-    return sp.lvls;
+    const timer = setInterval(()=>{
+        if (sp.flag) {
+            sp.spir();
+        } else {
+            clearTimeout(timer);
+            console.log(sp.lvls);
+        }
+    },1000);
 }
-spiralize(7);
+spiralize(30);
